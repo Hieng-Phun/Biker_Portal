@@ -42,9 +42,16 @@ class ProductAdmin(admin.ModelAdmin):
 # Register ServiceRental Model
 @admin.register(ServiceRental)
 class ServiceRentalAdmin(admin.ModelAdmin):
-    list_display = ('name', 'service_type', 'price_info', 'duration')
+    list_display = ('image_preview','name', 'service_type', 'price_info', 'duration')
     list_filter = ('service_type',)
     search_fields = ('name',)
+    readonly_fields = ["image_preview"]
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="width: 80px; height: auto;" />', obj.image.url)
+        return "No Image"
+    image_preview.short_description = 'Image Preview'
+
 
 # Register CartItem Model
 @admin.register(CartItem)
