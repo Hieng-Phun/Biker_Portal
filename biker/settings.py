@@ -26,7 +26,14 @@ SECRET_KEY = 'django-insecure-5i&r@hce@-av84m7%mdfbe(1zimdg86*i3uker=s0tr#1%_v4h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'bikerportal.up.railway.app',  
+]
+
+CSRF_TRUSTED_ORIGINS = ['https://bikerportal.up.railway.app']
 
 
 # Application definition
