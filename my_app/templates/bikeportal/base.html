@@ -91,7 +91,8 @@
               id="cart-count"
               class="ml-2 px-2 py-0.5 text-xs font-bold bg-primary text-white rounded-full"
             >
-              {% if user.is_authenticated %}{{ user.cartitem_set.all|length }}
+              {% if user.is_authenticated %}
+                {{ user.cartitem_set.all|length }}
               {% else %} 0 {% endif %}
             </span>
           </a>
