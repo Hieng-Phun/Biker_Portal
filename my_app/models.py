@@ -86,7 +86,7 @@ class Booking(models.Model):
     service_rental = models.ForeignKey(ServiceRental, on_delete=models.CASCADE)
     preferred_date = models.DateField()
     notes = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=50, default='Pending Confirmation',choices=BOOKING_TYPE_CHOICES)
+    status = models.CharField(max_length=50, default='PEDING',choices=BOOKING_TYPE_CHOICES)
     booked_at = models.DateTimeField(auto_now_add=True)
     
     # Only applicable for rentals
