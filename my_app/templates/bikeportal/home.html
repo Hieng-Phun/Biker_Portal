@@ -1,0 +1,241 @@
+{% extends "bikeportal/base.html" %} {% block title %}   Home - BikePortal
+{%endblock %} {% block content %}
+<!-- Main Section with Blurred Background Image - Now Full Height -->
+<section
+  class="relative text-center overflow-hidden flex items-center justify-center w-full min-h-screen"
+>
+  <!-- 1. Blurred Background Layer (Absolute position, z-0) -->
+  <div
+    class="absolute inset-0 z-0"
+    style="
+      /* Apply the image to this layer */
+      background-image: url('static/bg.jpg');
+      background-size: cover;
+      background-position: center;
+      /* Apply CSS blur filter */
+      filter: blur(0px);
+      /* Slightly scale up to hide blurred edges */
+      transform: scale(1.02);
+    "
+  ></div>
+
+  <!-- 2. Dark Overlay Layer (Optional, for better contrast over the blur) -->
+  <div class="absolute inset-0 z-0 bg-black opacity-20"></div>
+
+  <!-- Content Wrapper with Sharp Text (relative z-10 ensures it is on top) -->
+  <div
+    class="relative z-10 p-8 md:p-12 bg-black bg-opacity-50 rounded-xl shadow-2xl max-w-4xl mx-auto"
+  >
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4">
+      Welcome to the <span class="text-primary">Biker Portal</span>
+    </h1>
+    <p class="text-lg text-gray-200 max-w-3xl mx-auto mb-8">
+      Your one-stop destination for cycling gear, professional services, and
+      bike rentals. Use the navigation above to explore our offerings.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-10">
+      <a
+        href="{% url 'products' %}"
+        class="bg-primary hover:bg-indigo-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-xl transform hover:scale-[1.05]"
+      >
+        Browse Products
+      </a>
+      <a
+        href="{% url 'services_rental' %}"
+        class="bg-success hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-xl transform hover:scale-[1.05]"
+      >
+        Book Service / Rental
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="bg-gray-800 text-white shadow-inner">
+  <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <!-- Column 1: Explore -->
+      <div>
+        <h3
+          class="text-lg font-semibold text-primary mb-4 border-b border-primary pb-2"
+        >
+          Explore
+        </h3>
+        <ul class="space-y-3">
+          <li>
+            <a
+              href="{% url 'home' %}"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Home</a
+            >
+          </li>
+          <li>
+            <a
+              href="{% url 'products' %}"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Shop Gear</a
+            >
+          </li>
+          <li>
+            <a
+              href="{% url 'services_rental' %}"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Rentals</a
+            >
+          </li>
+          <li>
+            <a
+              href="{% url 'services_rental' %}"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Maintenance</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- Column 2: Company -->
+      <div>
+        <h3
+          class="text-lg font-semibold text-primary mb-4 border-b border-primary pb-2"
+        >
+          Company
+        </h3>
+        <ul class="space-y-3">
+          <li>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >About Us</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Careers</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Privacy Policy</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Terms of Service</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- Column 3: Support -->
+      <div>
+        <h3
+          class="text-lg font-semibold text-primary mb-4 border-b border-primary pb-2"
+        >
+          Support
+        </h3>
+        <ul class="space-y-3">
+          <li>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >FAQ</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Shipping Info</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Returns</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-300 hover:text-white transition duration-200"
+              >Contact Us</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- Column 4: Contact Info -->
+      <div class="col-span-2 md:col-span-1">
+        <h3
+          class="text-lg font-semibold text-primary mb-4 border-b border-primary pb-2"
+        >
+          Get in Touch
+        </h3>
+        <address class="text-gray-300 not-italic space-y-3">
+          <p>158 Chaom Chau, Phnom Penh, Cambodia</p>
+          <p>
+            Email:
+            <a
+              href="mailto:support@bikeportal.com"
+              class="hover:text-white transition duration-200"
+              >support@bikerportal168.com</a
+            >
+          </p>
+          <p>Phone: (+855) 984542366</p>
+          <div class="flex space-x-4 mt-4">
+            <!-- Social Media Icons (placeholders) -->
+            <a
+              href="#"
+              class="text-gray-400 hover:text-white transition duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M14 2c4.418 0 8 3.582 8 8 0 4.025-2.96 7.394-6.848 7.973-.002.007-.006.014-.006.023l-.001.071c0 .06-.002.1-.002.131 0 .225.182.407.407.407h.001l2.585.001c.224 0 .406.182.406.406v2.585c0 .224-.182.406-.406.406l-2.585.001h-.001c-.114 0-.226-.046-.309-.131-.083-.083-.131-.195-.131-.309v-2.185c0-.063-.049-.114-.114-.114h-1.558c-3.141 0-5.717-2.457-5.992-5.556-3.888-.579-6.848-3.948-6.848-7.973 0-4.418 3.582-8 8-8zm0 1.25c-3.722 0-6.75 3.028-6.75 6.75 0 3.722 3.028 6.75 6.75 6.75 3.722 0 6.75-3.028 6.75-6.75 0-3.722-3.028-6.75-6.75-6.75z"
+                />
+              </svg>
+            </a>
+            <a
+              href="#"
+              class="text-gray-400 hover:text-white transition duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M14 2c4.418 0 8 3.582 8 8 0 4.025-2.96 7.394-6.848 7.973-.002.007-.006.014-.006.023l-.001.071c0 .06-.002.1-.002.131 0 .225.182.407.407.407h.001l2.585.001c.224 0 .406.182.406.406v2.585c0 .224-.182.406-.406.406l-2.585.001h-.001c-.114 0-.226-.046-.309-.131-.083-.083-.131-.195-.131-.309v-2.185c0-.063-.049-.114-.114-.114h-1.558c-3.141 0-5.717-2.457-5.992-5.556-3.888-.579-6.848-3.948-6.848-7.973 0-4.418 3.582-8 8-8zm0 1.25c-3.722 0-6.75 3.028-6.75 6.75 0 3.722 3.028 6.75 6.75 6.75 3.722 0 6.75-3.028 6.75-6.75 0-3.722-3.028-6.75-6.75-6.75z"
+                />
+              </svg>
+            </a>
+          </div>
+        </address>
+      </div>
+    </div>
+
+    <!-- Copyright / Bottom Text -->
+    <div class="mt-12 pt-8 border-t border-gray-700 text-center">
+      <p class="text-sm text-gray-400">
+        &copy; 2025 BikerPortal. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
+
+{% endblock %}

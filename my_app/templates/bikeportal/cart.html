@@ -1,0 +1,167 @@
+{% extends "bikeportal/base.html" %} {% block title %}Shopping Cart -
+BikePortal{% endblock %} {% block content %} {% if cart_items %}
+<div class="mx-20">
+<div class="flex flex-col lg:flex-row gap-8">
+  <!-- Cart Items List -->
+  <div class="lg:w-3/5 bg-white rounded-xl shadow-lg p-6">
+    <h2 class="text-3xl font-bold text-secondary mb-6 border-b pb-4">
+      Shopping Cart
+    </h2>
+    <ul class="divide-y divide-gray-200">
+      {% for item in cart_items %}
+      <li
+        class="flex items-center justify-between p-4 border-b last:border-b-0"
+      >
+        <div class="flex items-center space-x-4 flex-grow">
+          <div
+            class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-sm font-semibold text-primary"
+          >
+            <img src="{{ item.product.image.url }}" alt="Product Image">
+          </div>
+          <div class="flex-grow">
+            <p class="font-semibold text-lg">{{ item.product.name }}</p>
+            <p class="text-sm text-gray-500">
+              ${{ item.product.price|floatformat:2 }} each
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <!-- Quantity Controls -->
+          <div class="flex items-center space-x-1">
+            <form
+              method="POST"
+              action="{% url 'update_cart' item_id=item.id %}"
+            >
+              {% csrf_token %}
+              <input type="hidden" name="action" value="decrement" />
+              <button
+                type="submit"
+                class="p-1 bg-gray-200 text-secondary rounded-full hover:bg-gray-300"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M20 12H4"
+                  ></path>
+                </svg>
+              </button>
+            </form>
+            <span class="font-bold w-6 text-center">{{ item.quantity }}</span>
+            <form
+              method="POST"
+              action="{% url 'update_cart' item_id=item.id %}"
+            >
+              {% csrf_token %}
+              <input type="hidden" name="action" value="increment" />
+              <button
+                type="submit"
+                class="p-1 bg-gray-200 text-secondary rounded-full hover:bg-gray-300"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4"
+                  ></path>
+                </svg>
+              </button>
+            </form>
+          </div>
+          <!-- Total Price -->
+          <p class="font-bold text-lg w-20 text-right text-secondary">
+            ${{ item.total_price|floatformat:2 }}
+          </p>
+
+          <!-- Remove Button -->
+          <form method="POST" action="{% url 'remove_cart' item_id=item.id %}">
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition duration-300"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Summary & Checkout -->
+  <div
+    class="lg:w-2/5 bg-white rounded-xl shadow-lg p-6 h-fit sticky top-24 border-t-4 border-primary"
+  >
+    <h3 class="text-2xl font-bold text-secondary mb-4 border-b pb-2">
+      Order Summary
+    </h3>
+
+    <div class="space-y-3 mb-6">
+      <div class="flex justify-between text-gray-600">
+        <span>Subtotal</span>
+        <span>${{ total|floatformat:2 }}</span>
+      </div>
+      <div class="flex justify-between text-gray-600">
+        <span>Shipping (Standard)</span>
+        <span>Free</span>
+      </div>
+      <div
+        class="flex justify-between text-xl font-bold pt-2 border-t border-gray-200"
+      >
+        <span>Order Total</span>
+        <span class="text-primary">${{ total|floatformat:2 }}</span>
+      </div>
+    </div>
+
+    <form method="POST" action="{% url 'checkout' %}">
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="w-full py-3 bg-success text-white text-lg font-bold rounded-lg shadow-xl hover:bg-green-600 transition duration-300 transform hover:scale-[1.01]"
+      >
+        Proceed to Checkout
+      </button>
+    </form>
+  </div>
+</div>
+{% else %}
+<div class="text-center p-16 bg-white rounded-xl shadow-lg">
+  <h2 class="text-3xl font-bold text-secondary mb-4">Your Cart is Empty</h2>
+  <p class="text-lg text-gray-500 mb-8">
+    It looks like you haven't added any products yet.
+  </p>
+  <a
+    href="{% url 'products' %}"
+    class="px-6 py-3 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-300"
+  >
+    Start Shopping Now
+  </a>
+</div>
+</div>
+{% endif %} {% endblock %}

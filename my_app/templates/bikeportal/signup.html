@@ -1,0 +1,94 @@
+{% extends "bikeportal/base.html" %} 
+{% block title %}Sign Up - BikePortal
+{%endblock %} 
+{% block content %}
+<div
+  class="max-w-md mx-auto p-8 bg-white rounded-xl shadow-2xl border-t-4 border-success"
+>
+  <h2 class="text-4xl font-extrabold text-secondary mb-2 text-center">
+    Join BikePortal
+  </h2>
+  <p class="text-center text-gray-500 mb-8">
+    Create your account to start shopping and booking.
+  </p>
+
+  <form method="POST" action="{% url 'signup' %}" class="space-y-6">
+    {% csrf_token %}
+
+    <div>
+      <label for="username" class="block text-sm font-medium text-gray-700"
+        >Username</label
+      >
+      <input
+        type="text"
+        name="username"
+        id="username"
+        required
+        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-success focus:border-success"
+        placeholder="Choose a unique username"
+      />
+    </div>
+
+    <div>
+      <label for="email" class="block text-sm font-medium text-gray-700"
+        >Email Address</label
+      >
+      <input
+        type="email"
+        name="email"
+        id="email"
+        required
+        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-success focus:border-success"
+        placeholder="you@example.com"
+      />
+    </div>
+
+    <div>
+      <label for="password" class="block text-sm font-medium text-gray-700"
+        >Password</label
+      >
+      <input
+        type="password"
+        name="password"
+        id="password"
+        required
+        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-success focus:border-success"
+        placeholder="Must be at least 8 characters"
+      />
+    </div>
+
+    <div>
+      <label for="password2" class="block text-sm font-medium text-gray-700"
+        >Confirm Password</label
+      >
+      <input
+        type="password"
+        name="password2"
+        id="password2"
+        required
+        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-success focus:border-success"
+        placeholder="Enter password again"
+      />
+    </div>
+
+    <button
+      type="submit"
+      class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-semibold text-white bg-success hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-success transition duration-300 transform hover:scale-[1.01]"
+    >
+      Sign Up
+    </button>
+  </form>
+
+  <div class="mt-6 text-center">
+    <p class="text-sm text-gray-600">
+      Already have an account?
+      <a
+        href="{% url 'login' %}"
+        class="font-medium text-primary hover:text-indigo-600 transition duration-300"
+      >
+        Log In here
+      </a>
+    </p>
+  </div>
+</div>
+{% endblock %}

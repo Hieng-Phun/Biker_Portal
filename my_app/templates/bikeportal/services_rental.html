@@ -1,0 +1,83 @@
+{% extends "bikeportal/base.html" %}
+{% block title %}Services & Rental - BikePortal{% endblock %}
+
+{% block content %}
+<div class="mx-20">
+<h2 class="text-3xl font-bold text-center text-secondary mb-10">Services & Rentals</h2>
+
+{% if user.is_authenticated %}
+    <div class="mb-10">
+        <h3 class="text-2xl font-bold text-secondary mb-4 border-b pb-2">My Current Bookings ({{ bookings|length }})</h3>
+        <ul class="space-y-4 custom-scroll max-h-80 overflow-y-auto">
+            {% for booking in bookings %}
+                <li class="p-4 bg-gray-50 rounded-lg flex justify-between items-center shadow-sm border-l-4 border-primary">
+                    <div>
+                        <p class="font-semibold text-lg">{{ booking.service_rental.name }}</p>
+                        <p class="text-sm text-gray-600">
+                            Date: <span class="font-medium">{{ booking.preferred_date|date:"F j, Y" }}</span> |
+                            Status: <span class="font-medium text-warning">{{ booking.status }}</span>
+                        </p>
+                    </div>
+                    <form method="POST" action="{% url 'cancel_booking' booking_id=booking.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition duration-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </form>
+                </li>
+            {% empty %}
+                <p class="text-center text-gray-500 p-8 bg-white rounded-lg">You have no active bookings.</p>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<h3 class="text-2xl font-bold text-secondary mb-4 border-b pb-2">Available Services</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    {% for item in services %}
+    <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 {% if item.service_type == 'RENTAL' %}border-success{% else %}border-warning{% endif %} flex flex-col transition duration-300 hover:shadow-xl hover:ring-2 hover:ring-primary/50">
+        <div class="flex items-center space-x-3 mb-3">
+            <span class="text-lg font-bold uppercase text-secondary">{{ item.get_service_type_display }}</span>
+            <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ item.duration }}</span>
+        </div>
+        <h3 class="text-2xl font-bold text-secondary mb-2">{{ item.name }}</h3>
+        <p class="text-gray-600 mb-4 flex-grow">{{ item.description }}</p>
+        <p class="text-xl font-extrabold text-primary mb-4">{{ item.price_info }}</p>
+        
+        {% if user.is_authenticated %}
+            {% if item.id in booked_ids %}
+                <button class="w-full py-2 bg-gray-400 text-white font-semibold rounded-lg cursor-not-allowed" disabled>
+                    Booked (See My Bookings)
+                </button>
+            {% else %}
+                <button 
+                    class="w-full py-2 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-300"
+                    onclick="openModal(
+                        '{% if item.service_type == "RENTAL" %}Book Your Rental{% else %}Schedule Service{% endif %} - {{ item.name }}',
+                        'Please provide your preferred date and details.',
+                        `
+                        <input type='hidden' name='service_id' value='{{ item.id }}'>
+                        <label for='date' class='block text-sm font-medium text-gray-700'>Preferred Date</label>
+                        <input type='date' id='date' name='date' required class='mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary'>
+                        
+                        {% if item.service_type == 'RENTAL' %}
+                        <label for='duration' class='block text-sm font-medium text-gray-700 mt-4'>Duration (Days)</label>
+                        <input type='number' id='duration' name='duration' value='1' min='1' required class='mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary'>
+                        {% endif %}
+
+                        <label for='notes' class='block text-sm font-medium text-gray-700 mt-4'>Details/Notes</label>
+                        <textarea id='notes' name='notes' rows='3' class='mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary'></textarea>
+                        `,
+                        '{% url "book_service" %}'
+                    )">
+                    {% if item.service_type == 'RENTAL' %}Book Your Rental{% else %}Schedule Service{% endif %}
+                </button>
+            {% endif %}
+        {% else %}
+            <p class="mt-4 text-center text-sm text-red-500">Log in to book this service.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}
