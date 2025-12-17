@@ -20,7 +20,7 @@
                                 Date: <span class="font-medium">{{ booking.preferred_date|date:"F j, Y" }}</span> |
                                 
                                 Status: 
-                                {% if booking.status == "Pending" %}
+                                {% if booking.status == "PEDING" %}
                                     <span class="font-medium text-warning">{{ booking.status }}</span>
                                 {% else %}
                                     <span class="font-medium text-success">{{ booking.status }}</span>
