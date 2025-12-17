@@ -93,7 +93,9 @@
             >
               {% if user.is_authenticated %}
                 {{ user.cartitem_set.all|length }}
-              {% else %} 0 {% endif %}
+              {% else %} 
+              0 
+              {% endif %}
             </span>
           </a>
         </nav>
