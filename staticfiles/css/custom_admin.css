@@ -1,0 +1,38 @@
+.main-footer {
+     display: none !important;
+}
+
+.wrapper {
+     min-height: 100vh;
+     position: relative;
+}
+
+
+.main-sidebar,
+.main-sidebar::before {
+     min-height: 100%;
+     height: 100%;
+}
+
+.content-wrapper {
+     min-height: calc(100vh - 57px);
+}
+/* static/css/small_login_logo.css */
+
+/* Target the logo container's image element on the login page */
+.login-logo img {
+     /* Set a maximum height for the logo */
+     max-height: 150px !important;
+
+     /* Set a maximum width (adjust as needed, keeping aspect ratio in mind) */
+     max-width: 200px !important;
+
+     /* Ensure the image scales down correctly */
+     width: auto !important;
+     height: auto !important;
+}
+
+/* Optional: Center the entire login box if the logo gets too small */
+.login-box {
+     margin-top: 5vh !important;
+}
