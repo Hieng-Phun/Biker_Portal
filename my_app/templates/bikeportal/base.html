@@ -103,16 +103,16 @@
         <div id="auth-status" class="flex space-x-3 items-center">
           {% if user.is_authenticated %}
           <span
-            class="text-sm text-gray-700 bg-gray-100 p-2 rounded-lg font-mono truncate hidden sm:inline"
+            class="text-sm text-secondary p-2 rounded-lg font-bold truncate hidden sm:inline"
           >
             Hello,
-            <span class="font-bold text-secondary">{{ user.username }}</span>
+            <span class="font-bold text-yellow-600">{{ user.username }}</span>
           </span>
           <form method="POST" action="{% url 'logout' %}" class="inline">
             {% csrf_token %}
             <button
               type="submit"
-              class="text-sm font-medium text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition duration-300 flex items-center space-x-1"
+              class="text-sm font-bold text-red-500 hover:text-red-700 py-2 px-4 rounded-lg border border-red-300  hover:bg-red-100 transition duration-300 flex items-center space-x-1"
             >
               <span class="hidden sm:inline">Logout</span>
             </button>
