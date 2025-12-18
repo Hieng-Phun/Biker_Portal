@@ -11,14 +11,14 @@
         <img class="h-40 object-contain mb-4 rounded-lg" 
              src="{{item.image.url}}" 
              alt="Product Image">
-        <span class="text-xs font-semibold uppercase text-primary mb-1">{{ item.category }}</span>
+        <span class="text-xs font-semibold uppercase text-yellow-600 mb-1">{{ item.category }}</span>
         <h3 class="text-xl font-bold text-secondary truncate">{{ item.name }}</h3>
-        <p class="text-sm text-gray-500 mt-1 flex-grow">{{ item.description }}</p>
+        <p class="text-sm text-gray-500 mt-1 flex-grow line-clamp-2">{{ item.description }}</p>
         <p class="text-2xl font-extrabold text-secondary mt-3">${{ item.price|floatformat:2 }}</p>
         
         {% if user.is_authenticated %}
             <button 
-                class="mt-4 w-full py-2 bg-primary text-white text-sm font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-300"
+                class="mt-4 w-full py-2 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-yellow-600 transition duration-300"
                 onclick="openModal(
                     'Add {{ item.name }} to Cart', 
                     'Confirm the quantity for this purchase: ${{ item.price|floatformat:2 }} each.',

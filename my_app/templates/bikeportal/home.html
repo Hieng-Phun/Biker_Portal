@@ -9,7 +9,7 @@
     class="absolute inset-0 z-0"
     style="
       /* Apply the image to this layer */
-      background-image: url('static/bg.jpg');
+      background-image: url('static/background.jpg');
       background-size: cover;
       background-position: center;
       /* Apply CSS blur filter */
@@ -24,10 +24,10 @@
 
   <!-- Content Wrapper with Sharp Text (relative z-10 ensures it is on top) -->
   <div
-    class="relative z-10 p-8 md:p-12 bg-black bg-opacity-50 rounded-xl shadow-2xl max-w-4xl mx-auto"
+    class="relative z-10 p-10 md:p-20 bg-black bg-opacity-50 rounded-xl shadow-2xl max-w-5xl mx-auto"
   >
     <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4">
-      Welcome to the <span class="text-primary">Biker Portal</span>
+      Welcome to the <span class="text-yellow-500">Biker Portal</span>
     </h1>
     <p class="text-lg text-gray-200 max-w-3xl mx-auto mb-8">
       Your one-stop destination for cycling gear, professional services, and
@@ -37,13 +37,13 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-10">
       <a
         href="{% url 'products' %}"
-        class="bg-primary hover:bg-indigo-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-xl transform hover:scale-[1.05]"
+        class="bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-xl transform hover:scale-[1.05]"
       >
         Browse Products
       </a>
       <a
         href="{% url 'services_rental' %}"
-        class="bg-success hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-xl transform hover:scale-[1.05]"
+        class="bg-green-600 hover:bg-green-500 text-white font-bold py-4 px-6 rounded-lg transition duration-300 shadow-xl transform hover:scale-[1.05]"
       >
         Book Service / Rental
       </a>
@@ -58,7 +58,7 @@
       <!-- Column 1: Explore -->
       <div>
         <h3
-          class="text-lg font-semibold text-primary mb-4 border-b border-primary pb-2"
+          class="text-lg font-semibold text-yellow-600 mb-4 border-b border-yellow-600 pb-2"
         >
           Explore
         </h3>
@@ -97,7 +97,7 @@
       <!-- Column 2: Company -->
       <div>
         <h3
-          class="text-lg font-semibold text-primary mb-4 border-b border-primary pb-2"
+          class="text-lg font-semibold text-yellow-600 mb-4 border-b border-yellow-600 pb-2"
         >
           Company
         </h3>
@@ -136,7 +136,7 @@
       <!-- Column 3: Support -->
       <div>
         <h3
-          class="text-lg font-semibold text-primary mb-4 border-b border-primary pb-2"
+          class="text-lg font-semibold text-yellow-600 mb-4 border-b border-yellow-600 pb-2"
         >
           Support
         </h3>
@@ -175,7 +175,7 @@
       <!-- Column 4: Contact Info -->
       <div class="col-span-2 md:col-span-1">
         <h3
-          class="text-lg font-semibold text-primary mb-4 border-b border-primary pb-2"
+          class="text-lg font-semibold text-yellow-600 mb-4 border-b border-yellow-600 pb-2"
         >
           Get in Touch
         </h3>
