@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import Product, ServiceRental, CartItem, Booking, CustomerProfile
+from .models import Product, ServiceRental, CartItem, Booking, CustomerProfile, Order, OrderItem, Payment
 from django.utils.html import format_html
 
 
@@ -56,20 +56,15 @@ class ServiceRentalAdmin(admin.ModelAdmin):
 # Register CartItem Model
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    # Added 'product_image' before 'product' in list_display
     list_display = ('user', 'product_image', 'product', 'quantity', 'total_price', 'added_at')
     list_filter = ('user', 'product__category')
     readonly_fields = ('total_price',)
 
     def total_price(self, obj):
-        """Calculates and returns the total price for the item."""
-        # Assuming CartItem model has a total_price() method
         return obj.total_price()
     total_price.short_description = 'Total Price'
 
     def product_image(self, obj):
-        """Displays a small thumbnail of the associated product image."""
-        # Check if the product and its image field exist and are not empty
         if obj.product and hasattr(obj.product, 'image') and obj.product.image:
             return format_html(
                 '<img src="{}" style="height: 50px; border-radius: 4px; object-fit: cover;" />',
@@ -78,10 +73,7 @@ class CartItemAdmin(admin.ModelAdmin):
         return "No Image"
 
     product_image.short_description = 'Image'
-    # Use 'product__image' to allow ordering by the image field (if applicable)
     product_image.admin_order_field = 'product__image'
-    # This is handled automatically by format_html, but included for clarity
-    product_image.allow_tags = True
 
 # Register Booking Model
 @admin.register(Booking)
@@ -89,4 +81,49 @@ class BookingAdmin(admin.ModelAdmin):
     list_display = ('user', 'service_rental', 'preferred_date','phone_number','city','location', 'status', 'booked_at')
     list_filter = ('status', 'service_rental__service_type', 'preferred_date')
     search_fields = ('user__username', 'service_rental__name')
-    list_editable = ('status',) # Allow status change directly in the list view
+    list_editable = ('status',)
+
+
+# --- New Order and Payment Admin ---
+
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ('product', 'price_at_purchase', 'quantity')
+
+class PaymentInline(admin.StackedInline):
+    model = Payment
+    can_delete = False
+    readonly_fields = ('paid_at',)
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'total_amount', 'status', 'payment_status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('user__username', 'id')
+    list_editable = ('status',)
+    inlines = [OrderItemInline, PaymentInline]
+
+    def payment_status(self, obj):
+        try:
+            status = obj.payment.status
+            colors = {
+                'PENDING': 'orange',
+                'COMPLETED': 'green',
+                'FAILED': 'red',
+            }
+            return format_html(
+                '<span style="color: {}; font-weight: bold;">{}</span>',
+                colors.get(status, 'black'),
+                status
+            )
+        except Payment.DoesNotExist:
+            return "No Payment"
+    payment_status.short_description = 'Payment Status'
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('order', 'payment_method', 'amount_paid', 'status', 'transaction_id', 'paid_at')
+    list_filter = ('status', 'payment_method', 'paid_at')
+    search_fields = ('transaction_id', 'order__id', 'order__user__username')
+    list_editable = ('status',)

@@ -4,10 +4,11 @@ from django.contrib import messages
 from django.db.models import Sum
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib.auth.models import User
+from django.db import transaction
 
-from .models import Product, ServiceRental, CartItem, Booking
+from .models import Product, ServiceRental, CartItem, Booking, Order, OrderItem, Payment, CustomerProfile
 
-# --- User Authentication Views (NEW) ---
+# --- User Authentication Views ---
 
 def signup_view(request):
     """Handles user registration."""
@@ -28,14 +29,12 @@ def signup_view(request):
             messages.error(request, "Username already taken.")
             return render(request, 'bikeportal/signup.html')
         
-        # Create user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
             messages.success(request, "Account created successfully! Please log in.")
             return redirect('login')
         except Exception as e:
-            # Catch database/validation errors
             messages.error(request, f"Registration failed: {e}")
             return render(request, 'bikeportal/signup.html')
         
@@ -73,12 +72,11 @@ def logout_view(request):
 
 def home_view(request):
     """Renders the Home page."""
-    # Context can be enriched with promotional items, etc.
     return render(request, 'bikeportal/home.html')
 
 def products_view(request):
     """Renders the Products listing page."""
-    products = Product.objects.filter(is_available=True).order_by('category', 'name','image')
+    products = Product.objects.filter(is_available=True).order_by('category', 'name')
     context = {'products': products}
     return render(request, 'bikeportal/products.html', context)
 
@@ -87,8 +85,6 @@ def services_rental_view(request):
     """Renders the Services & Rentals page and user's bookings."""
     services = ServiceRental.objects.all().order_by('service_type', 'name')
     bookings = Booking.objects.filter(user=request.user).order_by('-booked_at')
-    
-    # Get a list of IDs the user has already booked for UI feedback
     booked_ids = bookings.values_list('service_rental_id', flat=True)
     
     context = {
@@ -102,7 +98,6 @@ def services_rental_view(request):
 def cart_view(request):
     """Renders the Shopping Cart page."""
     cart_items = CartItem.objects.filter(user=request.user).select_related('product')
-    
     total = sum(item.total_price() for item in cart_items)
     
     context = {
@@ -134,10 +129,9 @@ def add_to_cart(request, product_id):
             )
             
             if not created:
-                # Item already exists, update quantity
                 cart_item.quantity += quantity
                 cart_item.save()
-                messages.success(request, f"Updated {product.name} quantity to {cart_item.quantity} in your cart.")
+                messages.success(request, f"Updated {product.name} quantity to {cart_item.quantity}.")
             else:
                 messages.success(request, f"Added {product.name} to your cart.")
         
@@ -154,16 +148,12 @@ def update_cart(request, item_id):
         if action == 'increment':
             cart_item.quantity += 1
             cart_item.save()
-            messages.info(request, f"Increased quantity of {cart_item.product.name}.")
         elif action == 'decrement':
             if cart_item.quantity > 1:
                 cart_item.quantity -= 1
                 cart_item.save()
-                messages.info(request, f"Decreased quantity of {cart_item.product.name}.")
             else:
-                # If quantity is 1 and user tries to decrement, remove it.
                 cart_item.delete()
-                messages.warning(request, f"Removed {cart_item.product.name} from cart.")
         
         return redirect('cart')
     return redirect('cart')
@@ -173,15 +163,14 @@ def remove_cart(request, item_id):
     """Handles removing a cart item completely."""
     if request.method == 'POST':
         cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
-        item_name = cart_item.product.name
         cart_item.delete()
-        messages.success(request, f"Removed {item_name} from your cart.")
+        messages.success(request, "Item removed from cart.")
         return redirect('cart')
     return redirect('cart')
 
 @login_required
 def checkout(request):
-    """Handles the checkout process (simulated)."""
+    """Processes the payment and creates an actual Order and Payment record."""
     if request.method == 'POST':
         cart_items = CartItem.objects.filter(user=request.user)
         
@@ -189,14 +178,51 @@ def checkout(request):
             messages.error(request, "Your cart is empty!")
             return redirect('cart')
             
-        # 1. Simulate Order Creation (Order model would be here)
-        # 2. Clear Cart
-        cart_items.delete()
+        total_amount = sum(item.total_price() for item in cart_items)
         
-        messages.success(request, "Checkout successful! Your order has been placed (simulated).")
+        # Get user address from profile if available
+        user_address = "No address provided"
+        try:
+            profile = CustomerProfile.objects.get(user=request.user)
+            if profile.address:
+                user_address = profile.address
+        except CustomerProfile.DoesNotExist:
+            pass
+
+        # Atomic transaction to ensure order, items, and payment are all created together
+        with transaction.atomic():
+            # 1. Create the Order
+            order = Order.objects.create(
+                user=request.user,
+                total_amount=total_amount,
+                shipping_address=user_address,
+                status='PROCESSING'
+            )
+
+            # 2. Create OrderItems (Snapshots)
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    price_at_purchase=item.product.price,
+                    quantity=item.quantity
+                )
+
+            # 3. Create the Payment record (Initial status: PENDING for KHQR)
+            Payment.objects.create(
+                order=order,
+                payment_method='KHQR',
+                amount_paid=total_amount,
+                status='PENDING'
+            )
+
+            # 4. Clear the User's Cart
+            cart_items.delete()
+        
+        messages.success(request, "Thank you! Your payment is being verified. Your order #{} has been placed.".format(order.id))
         return redirect('home')
         
-    return redirect('cart') # Prevent GET access
+    return redirect('cart')
 
 
 @login_required
@@ -206,11 +232,11 @@ def book_service(request):
         service_id = request.POST.get('service_id')
         preferred_date = request.POST.get('date')
         notes = request.POST.get('notes')
-        duration = request.POST.get('duration') # Optional for rentals
+        duration = request.POST.get('duration')
         phone = request.POST.get('phone_number')
         city = request.POST.get('city')
         location = request.POST.get('location')
-        # ------------------
+        
         service = get_object_or_404(ServiceRental, id=service_id)
 
         Booking.objects.create(
@@ -224,7 +250,7 @@ def book_service(request):
             duration_days=duration if service.service_type == 'RENTAL' else None
         )
 
-        messages.success(request, f"Successfully booked {service.name}! Confirmation pending.")
+        messages.success(request, f"Successfully booked {service.name}!")
         return redirect('services_rental')
     
     return redirect('services_rental')
@@ -234,8 +260,7 @@ def cancel_booking(request, booking_id):
     """Allows a user to cancel their pending booking."""
     if request.method == 'POST':
         booking = get_object_or_404(Booking, id=booking_id, user=request.user)
-        booking_name = booking.service_rental.name
         booking.delete()
-        messages.success(request, f"Cancelled booking for {booking_name}.")
+        messages.success(request, "Booking cancelled.")
         return redirect('services_rental')
     return redirect('services_rental')
