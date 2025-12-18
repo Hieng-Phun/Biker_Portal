@@ -7,7 +7,7 @@ from location_field.models.plain import PlainLocationField
 # Constants for Service/Rental Type
 SERVICE_TYPE_CHOICES = [
     ('RENTAL', 'Services Rental'),
-    ('SERVICE', 'Services Manternance'),
+    ('SERVICE', 'Services Maintenance'),
 ]
 
 PRODUCT_TYPE_CHOICES = [
