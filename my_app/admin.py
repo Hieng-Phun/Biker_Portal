@@ -86,7 +86,7 @@ class CartItemAdmin(admin.ModelAdmin):
 # Register Booking Model
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'service_rental', 'preferred_date', 'status', 'booked_at')
+    list_display = ('user', 'service_rental', 'preferred_date','phone_number','city','location', 'status', 'booked_at')
     list_filter = ('status', 'service_rental__service_type', 'preferred_date')
     search_fields = ('user__username', 'service_rental__name')
     list_editable = ('status',) # Allow status change directly in the list view

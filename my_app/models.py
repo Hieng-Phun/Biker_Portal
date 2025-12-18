@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User # Using Django's built-in User model
+from django.core.validators import RegexValidator
+from location_field.models.plain import PlainLocationField
+
 
 # Constants for Service/Rental Type
 SERVICE_TYPE_CHOICES = [
@@ -85,6 +88,10 @@ class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     service_rental = models.ForeignKey(ServiceRental, on_delete=models.CASCADE)
     preferred_date = models.DateField()
+    phone_regex = RegexValidator(regex=r'^\+?855?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
+    location = PlainLocationField(based_fields=['city'], zoom=7,null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
     notes = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=50, default='PEDING',choices=BOOKING_TYPE_CHOICES)
     booked_at = models.DateTimeField(auto_now_add=True)
@@ -94,3 +101,4 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking of {self.service_rental.name} by {self.user.username} on {self.preferred_date}"
+    

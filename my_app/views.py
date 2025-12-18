@@ -198,6 +198,7 @@ def checkout(request):
         
     return redirect('cart') # Prevent GET access
 
+
 @login_required
 def book_service(request):
     """Handles the booking of a service or rental."""
@@ -206,19 +207,26 @@ def book_service(request):
         preferred_date = request.POST.get('date')
         notes = request.POST.get('notes')
         duration = request.POST.get('duration') # Optional for rentals
-        
+        phone = request.POST.get('phone_number')
+        city = request.POST.get('city')
+        location = request.POST.get('location')
+        # ------------------
         service = get_object_or_404(ServiceRental, id=service_id)
-        
+
         Booking.objects.create(
             user=request.user,
             service_rental=service,
             preferred_date=preferred_date,
             notes=notes,
+            phone_number=phone, 
+            city=city,
+            location=location,
             duration_days=duration if service.service_type == 'RENTAL' else None
         )
-        
+
         messages.success(request, f"Successfully booked {service.name}! Confirmation pending.")
         return redirect('services_rental')
+    
     return redirect('services_rental')
 
 @login_required

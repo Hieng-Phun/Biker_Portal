@@ -39,6 +39,7 @@ CSRF_TRUSTED_ORIGINS = ['https://bikerportal.up.railway.app']
 # Application definition
 
 INSTALLED_APPS = [
+    'location_field.apps.DefaultConfig',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
