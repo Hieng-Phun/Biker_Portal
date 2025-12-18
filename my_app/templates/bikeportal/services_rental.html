@@ -100,7 +100,7 @@
                         `,
                         '{% url "book_service" %}'
                     ); initBookingMap();">
-                    {% if item.service_type == 'RENTAL' %}Book Your Rental{% else %}Schedule Service{% endif %}
+                    {% if item.service_type == 'RENTAL' %}Book Your Rental{% else %}Book Your Maintenance{% endif %}
                 </button>
             {% endif %}
         {% else %}
