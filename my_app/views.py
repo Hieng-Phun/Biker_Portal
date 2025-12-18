@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum
-from django.contrib.auth import authenticate, login, logout # NEW IMPORTS
-from django.contrib.auth.models import User # NEW IMPORT
+from django.contrib.auth import authenticate, login, logout 
+from django.contrib.auth.models import User
 
 from .models import Product, ServiceRental, CartItem, Booking
 
