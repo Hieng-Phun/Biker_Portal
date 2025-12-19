@@ -98,7 +98,7 @@ class PaymentInline(admin.StackedInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'total_amount', 'status', 'payment_status', 'created_at')
+    list_display = ('user', 'total_amount', 'status', 'payment_status', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('user__username', 'id')
     list_editable = ('status',)

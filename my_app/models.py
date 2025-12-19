@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
@@ -122,7 +123,7 @@ class Payment(models.Model):
     """Model to handle payment transaction details, specifically for KHQR."""
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='KHQR')
-    transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True) # Transaction reference from Bank
+    transaction_id = models.CharField(max_length=100, unique=True, default=uuid.uuid4, editable=False, null=True, blank=True) 
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='PENDING')
     paid_at = models.DateTimeField(auto_now_add=True)
