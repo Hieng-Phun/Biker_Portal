@@ -78,10 +78,22 @@ class CartItemAdmin(admin.ModelAdmin):
 # Register Booking Model
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('user', 'service_rental', 'preferred_date','phone_number','city','location', 'status', 'booked_at')
+    list_display = ('user','service_images', 'service_rental', 'preferred_date','phone_number','city','location', 'status', 'booked_at')
     list_filter = ('status', 'service_rental__service_type', 'preferred_date')
     search_fields = ('user__username', 'service_rental__name')
     list_editable = ('status',)
+    readonly_fields = ('service_images',)
+
+    def service_images(self, obj):
+        if obj.service_rental and hasattr(obj.service_rental, 'image') and obj.service_rental.image:
+            return format_html(
+                '<img src="{}" style="height: 50px; border-radius: 4px; object-fit: cover;" />',
+                obj.service_rental.image.url
+            )
+        return "No Image"
+
+    service_images.short_description = 'Image'
+    service_images.admin_order_field = 'service_images'
 
 
 # --- New Order and Payment Admin ---
