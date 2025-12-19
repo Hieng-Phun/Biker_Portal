@@ -101,7 +101,17 @@ class BookingAdmin(admin.ModelAdmin):
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
-    readonly_fields = ('product', 'price_at_purchase', 'quantity')
+    readonly_fields = ('product_image', 'product', 'price_at_purchase', 'quantity')
+    def product_image(self, obj):
+        if obj.product and hasattr(obj.product, 'image') and obj.product.image:
+            return format_html(
+                '<img src="{}" style="height: 50px; border-radius: 4px; object-fit: cover;" />',
+                obj.product.image.url
+            )
+        return "No Image"
+
+    product_image.short_description = 'Image'
+    product_image.admin_order_field = 'product__image'
 
 class PaymentInline(admin.StackedInline):
     model = Payment
@@ -110,7 +120,7 @@ class PaymentInline(admin.StackedInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('user', 'total_amount', 'status', 'payment_status', 'created_at')
+    list_display = ('user', 'total_amount', 'status', 'payment_status','shipping_address','phone_number', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('user__username', 'id')
     list_editable = ('status',)

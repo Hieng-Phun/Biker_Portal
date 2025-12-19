@@ -95,21 +95,6 @@ def services_rental_view(request):
     return render(request, 'bikeportal/services_rental.html', context)
 
 @login_required
-def cart_view(request):
-    """Renders the Shopping Cart page."""
-    cart_items = CartItem.objects.filter(user=request.user).select_related('product')
-    total = sum(item.total_price() for item in cart_items)
-    
-    context = {
-        'cart_items': cart_items,
-        'total': total,
-        'cart_count': cart_items.aggregate(Sum('quantity'))['quantity__sum'] or 0
-    }
-    return render(request, 'bikeportal/cart.html', context)
-
-# --- Action Views ---
-
-@login_required
 def add_to_cart(request, product_id):
     """Handles adding a product to the user's cart."""
     if request.method == 'POST':
@@ -168,9 +153,109 @@ def remove_cart(request, item_id):
         return redirect('cart')
     return redirect('cart')
 
+# @login_required
+# def cart_view(request):
+#     """Renders the Shopping Cart page with location field support."""
+#     cart_items = CartItem.objects.filter(user=request.user).select_related('product')
+#     total = sum(item.total_price() for item in cart_items)
+
+#     # Try to get default city/address from profile
+#     profile_address = ""
+#     profile_city = "Phnom Penh"
+#     try:
+#         profile = CustomerProfile.objects.get(user=request.user)
+#         profile_address = profile.address or ""
+#     except CustomerProfile.DoesNotExist:
+#         pass
+
+#     context = {
+#         'cart_items': cart_items,
+#         'total': total,
+#         'cart_count': cart_items.aggregate(Sum('quantity'))['quantity__sum'] or 0,
+#         'profile_address': profile_address,
+#         'default_city': profile_city
+#     }
+#     return render(request, 'bikeportal/cart.html', context)
+
+# @login_required
+# def checkout(request):
+#     """Processes checkout and captures the Google Map location/address."""
+#     if request.method == 'POST':
+#         cart_items = CartItem.objects.filter(user=request.user)
+        
+#         if not cart_items.exists():
+#             messages.error(request, "Your cart is empty!")
+#             return redirect('cart')
+            
+#         total_amount = sum(item.total_price() for item in cart_items)
+        
+#         # Capture precise location and formatted address from the JS Google Maps logic
+#         form_city_address = request.POST.get('city') # This contains the formatted address from search
+#         form_location = request.POST.get('location') # This contains "lat,lng" string
+        
+#         # We combine them into the shipping_address field for the order record
+#         shipping_info = f"{form_city_address} (GPS: {form_location})"
+
+#         with transaction.atomic():
+#             order = Order.objects.create(
+#                 user=request.user,
+#                 total_amount=total_amount,
+#                 shipping_address=shipping_info,
+#                 status='PROCESSING'
+#             )
+
+#             for item in cart_items:
+#                 OrderItem.objects.create(
+#                     order=order,
+#                     product=item.product,
+#                     price_at_purchase=item.product.price,
+#                     quantity=item.quantity
+#                 )
+
+#             Payment.objects.create(
+#                 order=order,
+#                 payment_method='KHQR',
+#                 amount_paid=total_amount,
+#                 status='PENDING'
+#             )
+
+#             cart_items.delete()
+        
+#         messages.success(request, f"Order #{order.id} placed successfully! Delivery location confirmed.")
+#         return redirect('home')
+        
+#     return redirect('cart')
+
+@login_required
+def cart_view(request):
+    """Renders the Shopping Cart page with location and phone field support."""
+    cart_items = CartItem.objects.filter(user=request.user).select_related('product')
+    total = sum(item.total_price() for item in cart_items)
+    
+    # Try to get default data from profile
+    profile_address = ""
+    profile_phone = ""
+    profile_city = "Phnom Penh"
+    try:
+        profile = CustomerProfile.objects.get(user=request.user)
+        profile_address = profile.address or ""
+        profile_phone = profile.phone_number or "" # Fetching existing phone number
+    except CustomerProfile.DoesNotExist:
+        pass
+
+    context = {
+        'cart_items': cart_items,
+        'total': total,
+        'cart_count': cart_items.aggregate(Sum('quantity'))['quantity__sum'] or 0,
+        'profile_address': profile_address,
+        'profile_phone': profile_phone,
+        'default_city': profile_city
+    }
+    return render(request, 'bikeportal/cart.html', context)
+
 @login_required
 def checkout(request):
-    """Processes the payment and creates an actual Order and Payment record."""
+    """Processes checkout and captures location, address, and phone number."""
     if request.method == 'POST':
         cart_items = CartItem.objects.filter(user=request.user)
         
@@ -180,26 +265,23 @@ def checkout(request):
             
         total_amount = sum(item.total_price() for item in cart_items)
         
-        # Get user address from profile if available
-        user_address = "No address provided"
-        try:
-            profile = CustomerProfile.objects.get(user=request.user)
-            if profile.address:
-                user_address = profile.address
-        except CustomerProfile.DoesNotExist:
-            pass
+        # Capture form data including the new phone_number field
+        form_city_address = request.POST.get('city')
+        form_location = request.POST.get('location')
+        form_phone = request.POST.get('phone_number')
+        
+        # Combine location info for the shipping_address field
+        shipping_info = f"{form_city_address} (GPS: {form_location})"
 
-        # Atomic transaction to ensure order, items, and payment are all created together
         with transaction.atomic():
-            # 1. Create the Order
             order = Order.objects.create(
                 user=request.user,
                 total_amount=total_amount,
-                shipping_address=user_address,
+                phone_number=form_phone, # Saving the phone number to the order
+                shipping_address=shipping_info,
                 status='PROCESSING'
             )
 
-            # 2. Create OrderItems (Snapshots)
             for item in cart_items:
                 OrderItem.objects.create(
                     order=order,
@@ -208,7 +290,6 @@ def checkout(request):
                     quantity=item.quantity
                 )
 
-            # 3. Create the Payment record (Initial status: PENDING for KHQR)
             Payment.objects.create(
                 order=order,
                 payment_method='KHQR',
@@ -216,14 +297,12 @@ def checkout(request):
                 status='PENDING'
             )
 
-            # 4. Clear the User's Cart
             cart_items.delete()
         
-        messages.success(request, "Thank you! Your payment is being verified. Your order #{} has been placed.".format(order.id))
+        messages.success(request, f"Order #{order.id} placed successfully! We will contact you at {form_phone}.")
         return redirect('home')
         
     return redirect('cart')
-
 
 @login_required
 def book_service(request):
