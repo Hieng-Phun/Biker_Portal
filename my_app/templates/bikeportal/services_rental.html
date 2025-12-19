@@ -24,7 +24,7 @@
                                 Loc: <span class="font-medium">{{ booking.city|default:"N/A" }}</span> |
                                 
                                 Status: 
-                                {% if booking.status == "PEDING" %}
+                                {% if booking.status == "PENDING" %}
                                     <span class="text-warning font-bold">{{ booking.status }}</span>
                                 {% else %}
                                     <span class="text-success font-bold">{{ booking.status }}</span>
