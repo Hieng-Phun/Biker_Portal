@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.forms import ValidationError
 from location_field.models.plain import PlainLocationField
 
 # Constants for Service/Rental Type
@@ -57,13 +58,28 @@ class Product(models.Model):
     category = models.CharField(max_length=50, choices=PRODUCT_TYPE_CHOICES)
     description = models.TextField()
     image = models.ImageField(upload_to='images/')
+    quantity = models.PositiveIntegerField(
+        default=0,
+        help_text="Current stock level available for this product."
+    )
     is_available = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        """Override save to handle availability based on stock quantity."""
+        if self.quantity == 0:
+            self.is_available = False
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name} ({self.category})"
-    
+        return f"{self.name} ({self.get_category_display()})"
+
     class Meta:
+        verbose_name = "Product"
         verbose_name_plural = "Products"
+        # Orders by newest items first by default
+        ordering = ['-created_at']
 
 class ServiceRental(models.Model):
     image = models.ImageField(upload_to='images/')
@@ -120,6 +136,29 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in Order #{self.order.id}"
+    
+    def save(self, *args, **kwargs):
+        """Subtract the ordered quantity from the Product stock upon creation."""
+        if not self.pk: # Only on creation
+            if self.product:
+                # Critical check: Does the store have enough stock?
+                if self.product.quantity < self.quantity:
+                    raise ValidationError(
+                        f"Insufficient stock for {self.product.name}. "
+                        f"Only {self.product.quantity} left in stock."
+                    )
+                
+                # Use F() expressions in a real high-traffic app, 
+                # but for this logic, we update the instance:
+                self.product.quantity -= self.quantity
+                self.product.save()
+        
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        product_name = self.product.name if self.product else "Deleted Product"
+        return f"{self.quantity} x {product_name} in Order #{self.order.id}"
+    
 
 class Payment(models.Model):
     """Model to handle payment transaction details, specifically for KHQR."""

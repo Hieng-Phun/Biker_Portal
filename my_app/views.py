@@ -255,52 +255,86 @@ def cart_view(request):
 
 @login_required
 def checkout(request):
-    """Processes checkout and captures location, address, and phone number."""
+    """Processes checkout, validates stock, and captures order details."""
     if request.method == 'POST':
         cart_items = CartItem.objects.filter(user=request.user)
         
         if not cart_items.exists():
             messages.error(request, "Your cart is empty!")
             return redirect('cart')
+        
+        # 1. Server-side Stock Validation
+        # We check all items before starting the transaction to ensure availability
+        for item in cart_items:
+            if item.quantity > item.product.quantity:
+                messages.error(
+                    request, 
+                    f"Sorry, only {item.product.quantity} units of '{item.product.name}' are left in stock. "
+                    f"Please update your cart quantity."
+                )
+                return redirect('cart')
             
         total_amount = sum(item.total_price() for item in cart_items)
         
-        # Capture form data including the new phone_number field
+        # Capture form data
         form_city_address = request.POST.get('city')
         form_location = request.POST.get('location')
         form_phone = request.POST.get('phone_number')
         
-        # Combine location info for the shipping_address field
         shipping_info = f"{form_city_address} (GPS: {form_location})"
 
-        with transaction.atomic():
-            order = Order.objects.create(
-                user=request.user,
-                total_amount=total_amount,
-                phone_number=form_phone, # Saving the phone number to the order
-                shipping_address=shipping_info,
-                status='PROCESSING'
-            )
-
-            for item in cart_items:
-                OrderItem.objects.create(
-                    order=order,
-                    product=item.product,
-                    price_at_purchase=item.product.price,
-                    quantity=item.quantity
+        try:
+            with transaction.atomic():
+                # 2. Create the Order
+                order = Order.objects.create(
+                    user=request.user,
+                    total_amount=total_amount,
+                    phone_number=form_phone,
+                    shipping_address=shipping_info,
+                    status='PROCESSING'
                 )
 
-            Payment.objects.create(
-                order=order,
-                payment_method='KHQR',
-                amount_paid=total_amount,
-                status='PENDING'
-            )
+                for item in cart_items:
+                    product = item.product
+                    
+                    # 3. Double-check stock inside the atomic transaction (Locking)
+                    # We re-fetch the product to ensure we have the latest quantity
+                    if product.quantity < item.quantity:
+                        raise ValueError(f"Insufficient stock for {product.name}")
 
-            cart_items.delete()
-        
-        messages.success(request, f"Order #{order.id} placed successfully! We will contact you at {form_phone}.")
-        return redirect('home')
+                    # 4. Deduct the quantity from the Product model
+                    product.quantity -= item.quantity
+                    product.save()
+
+                    # Create Order Item
+                    OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        price_at_purchase=product.price,
+                        quantity=item.quantity
+                    )
+
+                # 5. Create Payment record
+                Payment.objects.create(
+                    order=order,
+                    payment_method='KHQR',
+                    amount_paid=total_amount,
+                    status='PENDING'
+                )
+
+                # 6. Clear the user's cart
+                cart_items.delete()
+            
+            messages.success(request, f"Order #{order.id} placed successfully! We will contact you at {form_phone}.")
+            return redirect('home')
+
+        except ValueError as e:
+            # Handle the error if stock ran out during the processing time
+            messages.error(request, str(e))
+            return redirect('cart')
+        except Exception:
+            messages.error(request, "An error occurred while processing your order. Please try again.")
+            return redirect('cart')
         
     return redirect('cart')
 

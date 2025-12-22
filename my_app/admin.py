@@ -29,7 +29,7 @@ admin.site.register(User, CustomUserAdmin)
 # Register Product Model
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'category','image_preview', 'is_available')
+    list_display = ('name', 'price', 'category','image_preview','quantity', 'is_available')
     list_filter = ('category', 'is_available')
     search_fields = ('name', 'description')
     readonly_fields = ["image_preview"]
@@ -148,4 +148,4 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display = ('order', 'payment_method', 'amount_paid', 'status', 'transaction_id', 'paid_at')
     list_filter = ('status', 'payment_method', 'paid_at')
     search_fields = ('transaction_id', 'order__id', 'order__user__username')
-    list_editable = ('status',)
+    list_editable = ('payment_method','status',)

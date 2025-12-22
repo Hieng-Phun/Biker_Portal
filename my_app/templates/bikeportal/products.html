@@ -14,7 +14,8 @@
         <span class="text-xs font-semibold uppercase text-yellow-600 mb-1">{{ item.category }}</span>
         <h3 class="text-xl font-bold text-secondary truncate">{{ item.name }}</h3>
         <p class="text-sm text-gray-500 mt-1 flex-grow line-clamp-2">{{ item.description }}</p>
-        <p class="text-2xl font-extrabold text-secondary mt-3">${{ item.price|floatformat:2 }}</p>
+        <span class="text-lg font-semibold text-green-600 mt-2">Quantity: {{ item.quantity }}</span>
+        <p class="text-2xl font-extrabold text-secondary mt-2">${{ item.price|floatformat:2 }}</p>
         
         {% if user.is_authenticated %}
             <button 
