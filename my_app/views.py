@@ -363,10 +363,11 @@ def order_detail(request, order_id):
     # Fetch all items associated with this specific order (the order history items)
     # price_at_purchase is used to show what the user actually paid at that time
     order_items = OrderItem.objects.filter(order=order)
-
+    payments = Payment.objects.filter(order=order)
     context = {
         'order': order,
         'order_items': order_items,
+        'payments': payments
     }
     return render(request, 'orders/order_detail.html', context)
 

@@ -217,20 +217,24 @@ BikePortal{% endblock %} {% block content %}
         >
           Payment Summary
         </h3>
+        {% for payment in payments %}
         <div class="flex items-center justify-between mb-4">
           <span class="text-sm text-gray-500 font-medium">Payment Method</span>
           <span class="text-sm font-black text-red-600 flex items-center">
-            <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></span>
-            KHQR
+            <span class="w-1.5 h-1.5 bg-red-600 rounded-full "></span>
+            {{ payment.payment_method }}
           </span>
         </div>
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-500 font-medium">Payment Status</span>
+          
           <span
-            class="text-[10px] font-black text-secondary uppercase bg-gray-100 px-2 py-1 rounded-md"
-            >Verified</span
+            class="text-[10px] font-black uppercase px-2 py-1 rounded-md {% if payment.status == 'PENDING' %} text-blue-600 bg-blue-100 {% elif payment.status == 'COMPLETED' %} text-green-600 bg-green-100 {% else %} text-red-600 bg-red-100 {% endif %}"
+            >{{ payment.status }}</span
           >
+        
         </div>
+        {% endfor %}
       </div>
 
       <!-- Help & Actions -->
