@@ -9,6 +9,8 @@ BikePortal{% endblock %} {% block content %}
       <nav
         class="flex items-center text-[10px] md:text-xs font-black uppercase tracking-widest text-gray-400 mb-2"
       >
+        <a href="{% url 'cart' %}" class="hover:text-primary transition">Cart</a>
+        <span class="mx-2 text-gray-300">/</span>
         <a
           href="{% url 'order_history' %}"
           class="hover:text-primary transition"
