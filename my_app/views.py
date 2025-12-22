@@ -339,6 +339,38 @@ def checkout(request):
     return redirect('cart')
 
 @login_required
+def order_history(request):
+    """
+    Displays a list of all orders placed by the logged-in user.
+    """
+    # We use select_related or prefetch_related if you want to optimize 
+    # but for a basic history, fetching the orders is sufficient.
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'orders/order_history.html', context)
+
+@login_required
+def order_detail(request, order_id):
+    """
+    Displays the details of a specific order, including all purchased items (OrderItem history).
+    """
+    # Ensure the user can only view their own orders for security
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # Fetch all items associated with this specific order (the order history items)
+    # price_at_purchase is used to show what the user actually paid at that time
+    order_items = OrderItem.objects.filter(order=order)
+
+    context = {
+        'order': order,
+        'order_items': order_items,
+    }
+    return render(request, 'orders/order_detail.html', context)
+
+@login_required
 def book_service(request):
     """Handles the booking of a service or rental."""
     if request.method == 'POST':

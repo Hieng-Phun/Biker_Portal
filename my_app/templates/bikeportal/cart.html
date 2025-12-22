@@ -1,6 +1,10 @@
 {% extends "bikeportal/base.html" %} {% block title %}Shopping Cart -
 BikePortal{% endblock %} {% block content %} {% if cart_items %}
 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+  <div class="mb-7">
+    <a href="{% url 'order_history' %}"
+      class=" bg-yellow-400 hover:text-blue-800 text-sm underline underline-offset-4 font-bold text-secondary border hover:border-blue-600 px-4 py-2 rounded-xl">Orders History</a>
+  </div>
   <div class="flex flex-col lg:flex-row gap-8">
     <!-- Cart Items List -->
     <div class="lg:w-3/5 space-y-6">
@@ -478,6 +482,10 @@ BikePortal{% endblock %} {% block content %} {% if cart_items %}
     >
       Browse Products
     </a>
+    <div class="mt-5">
+      <a href="{% url 'order_history' %}"
+        class="underline underline-offset-4 hover:text-blue-600 hover:decoration-blue-700">Orders History</a>
+    </div>
   </div>
 </div>
 {% endif %} {% endblock %}

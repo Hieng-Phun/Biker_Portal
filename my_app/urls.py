@@ -7,6 +7,12 @@ urlpatterns = [
     path('products/', views.products_view, name='products'),
     path('services-rental/', views.services_rental_view, name='services_rental'),
     path('cart/', views.cart_view, name='cart'),
+
+    # View all orders (Order History)
+    path('orders/', views.order_history, name='order_history'),
+
+    # View specific order details and item history
+    path('orders/<int:order_id>/', views.order_detail, name='order_detail'),
     
     # User Authentication Paths (NEW)
     path('signup/', views.signup_view, name='signup'),

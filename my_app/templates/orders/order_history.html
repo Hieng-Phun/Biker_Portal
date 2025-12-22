@@ -1,0 +1,95 @@
+{% extends "bikeportal/base.html" %} {% block title %}Order History -
+BikePortal{% endblock %} {% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+  <div class="mb-8">
+    <h1 class="text-3xl font-black text-secondary">My Orders</h1>
+    <p class="text-gray-500">View and track your previous purchases.</p>
+  </div>
+
+  {% if orders %}
+  <div class="space-y-4">
+    {% for order in orders %}
+    <div
+      class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300"
+    >
+      <div class="p-6 flex flex-wrap items-center justify-between gap-4">
+        <!-- Order Basic Info -->
+        <div class="flex items-center space-x-6">
+          <div class="bg-gray-50 p-3 rounded-lg text-center min-w-[80px]">
+            <span class="block text-xs font-bold uppercase text-gray-400"
+              >Order</span
+            >
+            <span class="text-lg font-black text-secondary"
+              >#{{ order.id }}</span
+            >
+          </div>
+          <div>
+            <p class="text-sm text-gray-400 font-bold uppercase tracking-wider">
+              Date Placed
+            </p>
+            <p class="font-semibold text-secondary">
+              {{ order.created_at|date:"d M, Y" }}
+            </p>
+          </div>
+          <div class="hidden md:block">
+            <p class="text-sm text-gray-400 font-bold uppercase tracking-wider">
+              Total Amount
+            </p>
+            <p class="font-black text-primary">
+              ${{ order.total_amount|floatformat:2 }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Status & Action -->
+        <div class="flex items-center space-x-4 ml-auto">
+          <span
+            class="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest {% if order.status == 'PROCESSING' %} bg-blue-100 text-blue-700 {% elif order.status == 'DELIVERED' %} bg-green-100 text-green-700 {% elif order.status == 'SHIPPED' %} bg-yellow-100 text-yellow-700 {% else %} bg-red-100 text-red-700 {% endif %}"
+          >
+            {{ order.status }}
+          </span>
+
+          <a
+            href="{% url 'order_detail' order.id %}"
+            class="px-6 py-2.5 bg-secondary text-white text-sm font-bold rounded-lg hover:bg-opacity-90 transition transform hover:scale-[1.02]"
+          >
+            View Details
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <!-- Empty State -->
+  <div
+    class="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-200"
+  >
+    <div
+      class="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+    >
+      <svg
+        class="w-10 h-10 text-gray-300"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+        ></path>
+      </svg>
+    </div>
+    <h2 class="text-xl font-bold text-secondary">No orders found</h2>
+    <p class="text-gray-500 mb-6">You haven't made any purchases yet.</p>
+    <a
+      href="{% url 'products' %}"
+      class="text-primary font-bold hover:underline"
+      >Go Shopping &rarr;</a
+    >
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
