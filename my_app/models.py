@@ -118,7 +118,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='PROCESSING')
-    phone_regex = RegexValidator(regex=r'^\+?855?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone_regex = RegexValidator(regex=r'^\+?855?\d{9,10}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True,null=True)
     shipping_address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -133,27 +133,6 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.quantity} x {self.product.name} in Order #{self.order.id}"
-    
-    def save(self, *args, **kwargs):
-        """Subtract the ordered quantity from the Product stock upon creation."""
-        if not self.pk: # Only on creation
-            if self.product:
-                # Critical check: Does the store have enough stock?
-                if self.product.quantity < self.quantity:
-                    raise ValidationError(
-                        f"Insufficient stock for {self.product.name}. "
-                        f"Only {self.product.quantity} left in stock."
-                    )
-                
-                # Use F() expressions in a real high-traffic app, 
-                # but for this logic, we update the instance:
-                self.product.quantity -= self.quantity
-                self.product.save()
-        
-        super().save(*args, **kwargs)
 
     def __str__(self):
         product_name = self.product.name if self.product else "Deleted Product"
@@ -177,7 +156,7 @@ class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     service_rental = models.ForeignKey(ServiceRental, on_delete=models.CASCADE)
     preferred_date = models.DateField()
-    phone_regex = RegexValidator(regex=r'^\+?855?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone_regex = RegexValidator(regex=r'^\+?855?\d{9,10}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
     location = PlainLocationField(based_fields=['city'], zoom=7, null=True, blank=True)
     city = models.CharField(max_length=255, null=True, blank=True)
