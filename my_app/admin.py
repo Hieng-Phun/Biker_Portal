@@ -52,7 +52,6 @@ class ServiceRentalAdmin(admin.ModelAdmin):
         return "No Image"
     image_preview.short_description = 'Image Preview'
 
-
 # Register CartItem Model
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):

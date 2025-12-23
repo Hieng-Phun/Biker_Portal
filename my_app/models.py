@@ -7,8 +7,8 @@ from location_field.models.plain import PlainLocationField
 
 # Constants for Service/Rental Type
 SERVICE_TYPE_CHOICES = [
-    ('RENTAL', 'Services Rental'),
-    ('SERVICE', 'Services Maintenance'),
+    ('RENTAL', 'Rental'),
+    ('SERVICE', 'Maintenance'),
 ]
 
 PRODUCT_TYPE_CHOICES = [
@@ -81,25 +81,6 @@ class Product(models.Model):
         # Orders by newest items first by default
         ordering = ['-created_at']
 
-class ServiceRental(models.Model):
-    image = models.ImageField(upload_to='images/')
-    name = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='offered_services',
-        verbose_name='Service Provider'
-    )
-    service_type = models.CharField(max_length=10, choices=SERVICE_TYPE_CHOICES)
-    price_info = models.CharField(max_length=100)
-    duration = models.CharField(max_length=50)
-    description = models.TextField()
-
-    def __str__(self):
-        return f"{self.name} ({self.service_type}) managed by {self.name.username}"
-    
-    class Meta:
-        verbose_name_plural = "Services and Rentals"
-
 class CartItem(models.Model):
     """Model representing an item in a user's shopping cart."""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -150,6 +131,22 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment for Order #{self.order.id} - Status: {self.status}"
+
+
+class ServiceRental(models.Model):
+    image = models.ImageField(upload_to='images/')
+    name = models.CharField(max_length=200)
+    service_type = models.CharField(max_length=10, choices=SERVICE_TYPE_CHOICES)
+    price_info = models.CharField(max_length=100)
+    duration = models.CharField(max_length=50,blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.service_type})"
+    
+    class Meta:
+        verbose_name_plural = "Services"
+
 
 class Booking(models.Model):
     """Model for services or rentals scheduled by a user."""

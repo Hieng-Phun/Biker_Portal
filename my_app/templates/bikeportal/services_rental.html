@@ -5,7 +5,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
 
 <div class="mx-20">
-<h2 class="text-3xl font-bold text-center text-secondary mb-10">Services & Rentals</h2>
+<h2 class="text-3xl font-bold text-center text-secondary mb-10">Services</h2>
 
 {% if user.is_authenticated %}
     <div class="mb-10">
@@ -57,7 +57,10 @@
         </div>
         <div class="flex items-center space-x-3 mb-3">
             <span class="text-sm font-bold uppercase text-secondary">{{ item.get_service_type_display }}</span>
+            
+        {% if item.service_type == 'RENTAL' %}
             <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ item.duration }} Hour</span>
+        {% endif %}  
         </div>
         <p class="text-gray-600 mb-4 flex-grow">{{ item.description }}</p>
         <p class="text-xl font-extrabold text-secondary mb-4">${{ item.price_info }}</p>
@@ -91,7 +94,7 @@
                         <input type='hidden' name='city' id='id_city'>
 
                         {% if item.service_type == 'RENTAL' %}
-                        <label class='block text-sm font-medium text-gray-700'>Duration (Days)</label>
+                        <label class='block text-sm font-medium text-gray-700'>Duration (Hour)</label>
                         <input type='number' name='duration' value='1' min='1' required class='mt-1 block w-full p-2 border rounded-lg mb-3'>
                         {% endif %}
 
