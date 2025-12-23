@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-LOGIN_URL = '/admin/login/' # Change this to your custom login URL if not using admin
+LOGIN_URL = '/login/' # Change this to your custom login URL if not using admin
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
