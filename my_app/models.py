@@ -151,7 +151,7 @@ class ServiceRental(models.Model):
 class Booking(models.Model):
     """Model for services or rentals scheduled by a user."""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    service_rental = models.ForeignKey(ServiceRental, on_delete=models.CASCADE)
+    service_rental = models.ForeignKey(ServiceRental, on_delete=models.CASCADE, verbose_name="Services")
     preferred_date = models.DateField()
     phone_regex = RegexValidator(regex=r'^\+?855?\d{9,10}$', message="Phone number must be entered in the format: '+855...'.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
@@ -164,3 +164,4 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking of {self.service_rental.name} by {self.user.username} on {self.preferred_date}"
+    
