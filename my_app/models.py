@@ -115,6 +115,10 @@ class OrderItem(models.Model):
     price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
 
+    @property
+    def total_item_price(self):
+        return self.price_at_purchase * self.quantity
+    
     def __str__(self):
         product_name = self.product.name if self.product else "Deleted Product"
         return f"{self.quantity} x {product_name} in Order #{self.order.id}"

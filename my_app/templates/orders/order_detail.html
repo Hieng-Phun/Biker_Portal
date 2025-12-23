@@ -128,7 +128,7 @@ BikePortal{% endblock %} {% block content %}
                 Total
               </span>
               <p class="text-lg md:text-xl font-black text-secondary tracking-tight">
-                ${{item.price_at_purchase|floatformat:2}}
+                ${{ item.total_item_price|floatformat:2 }}
               </p>
             </div>
           </div>
