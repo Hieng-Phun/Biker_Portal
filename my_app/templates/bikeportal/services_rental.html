@@ -62,7 +62,7 @@
             <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{{ item.duration }} Hour</span>
         {% endif %}  
         </div>
-        <p class="text-gray-600 mb-4 flex-grow">{{ item.description }}</p>
+        <p class="text-gray-600 mb-4 flex-grow line-clamp-2">{{ item.description }}</p>
         <p class="text-xl font-extrabold text-secondary mb-4">${{ item.price_info }}</p>
         
         {% if user.is_authenticated %}
